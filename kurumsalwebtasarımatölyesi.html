@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Görsel Kod Atölyesi | Web Tasarım Macerası</title>
+    
+    <!-- Tarayıcı Sekmesi için YENİ SVG Logo (Kod ve Tasarımı Simgeler) -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M 50 10 L 90 50 L 50 90 L 10 50 Z' fill='%23FF1493'/%3E%3Cpath d='M 30 50 L 45 35 M 45 65 L 30 50' stroke='%23FFFFFF' stroke-width='8' fill='none' stroke-linecap='round'/%3E%3Cpath d='M 70 50 L 55 35 M 55 65 L 70 50' stroke='%23FFFFFF' stroke-width='8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@700;800;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Roboto:wght@300;400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Bungee+Shade&family=Lato:wght@300;400;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7fafc;
+        }
+        .sketch-shadow {
+            box-shadow: 8px 8px 0px rgba(0, 0, 0, 0.2), 
+                        -4px -4px 0px rgba(255, 255, 255, 0.5);
+            transition: all 0.2s ease-in-out;
+            border: 2px solid #333;
+        }
+        .sketch-shadow:hover {
+            box-shadow: 12px 12px 0px rgba(0, 0, 0, 0.3), 
+                        -6px -6px 0px rgba(255, 255, 255, 0.6);
+            transform: translate(-2px, -2px);
+        }
+        .text-gradient {
+            background-image: linear-gradient(to right, #FF4500, #FF1493);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .code-easy-btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .code-easy-btn:active {
+            transform: translateY(2px);
+            box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.2);
+        }
+        .dynamic-title {
+            transition: transform 0.3s ease-in-out, color 0.3s ease-in-out, border-color 0.3s;
+            cursor: default; 
+            display: inline-block; 
+            padding-bottom: 4px;
+            font-family: 'Poppins', sans-serif; 
+            font-weight: 900; 
+            border-bottom-width: 6px;
+            border-style: solid;
+        }
+        .dynamic-title:hover {
+            transform: scale(1.02); 
+        }
+        @keyframes neon-glow {
+            0%, 100% { 
+                text-shadow: 0 0 5px rgba(255, 255, 255, 0.5), 0 0 10px rgba(255, 0, 100, 0.4); 
+            }
+            50% { 
+                text-shadow: 0 0 8px rgba(255, 255, 255, 0.8), 0 0 15px rgba(255, 0, 100, 0.8); 
+            }
+        }
+        .animated-headline {
+            animation: neon-glow 3s infinite alternate;
+        }
+        .focus-item {
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); 
+            cursor: pointer;
+            filter: grayscale(10%); 
+            position: relative;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
+        }
+        .focus-item.active {
+            transform: scale(1.1);
+            z-index: 10;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 15px #FF4500; 
+            filter: grayscale(0%); 
+            border-color: #FF1493 !important;
+        }
+        .quiz-card {
+            background-color: #ffffff;
+            border-radius: 1rem; 
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1); 
+            padding: 2rem; 
+        }
+        .question {
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            border-left: 6px solid #FF4500; 
+            background-color: #fcfcfc; 
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); 
+            transition: background-color 0.2s;
+        }
+        .question:last-child {
+            margin-bottom: 0;
+        }
+        .answer-label {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem; 
+            margin-bottom: 0.5rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s, border 0.2s;
+            border: 1px solid #ddd; 
+            background-color: #fff;
+        }
+        .answer-label:hover {
+            background-color: #f0f0f0;
+            transform: scale(1.01);
+            border-color: #FF4500;
+        }
+        .answer-label input[type="radio"] {
+            display: none;
+        }
+        .answer-label:before {
+            content: '';
+            display: inline-block;
+            width: 1rem;
+            height: 1rem;
+            border-radius: 50%;
+            border: 2px solid #FF4500;
+            margin-right: 0.75rem;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .answer-label input[type="radio"]:checked:before {
+             background-color: #FF4500;
+        }
+        .answer-label input[type="radio"]:checked ~ .answer-text {
+            font-weight: bold;
+        }
+        .correct {
+            background-color: #e5ffe5 !important; 
+            border: 2px solid #34d399 !important;
+            font-weight: bold;
+        }
+        .incorrect {
+            background-color: #ffeeee !important; 
+            border: 2px solid #f87171 !important;
+            font-weight: bold;
+        }
+        .correct:before, .incorrect:before {
+            border-color: transparent !important; 
+        }
+        .correct:before {
+            background-color: #34d399 !important; 
+            content: '✓' !important; 
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+        }
+        .incorrect:before {
+            background-color: #f87171 !important; 
+            content: '✕' !important; 
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <!-- Navbar -->
+    <header class="bg-white shadow-lg sticky top-0 z-10 border-b-4 border-black">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+            <h1 class="text-3xl font-black text-gray-900">
+                ✏️ <span class="text-gradient">Görsel Kod Atölyesi</span>
+            </h1>
+            <nav class="hidden sm:block">
+                <a href="#test" class="nav-link text-gray-600 hover:text-red-500 px-3 py-2 rounded-md text-sm font-medium transition duration-150 font-extrabold">🚨 TESTİ ÇÖZ</a>
+                <a href="#renkler" class="nav-link text-gray-600 hover:text-pink-500 px-3 py-2 rounded-md text-sm font-medium transition duration-150">Renk Uyumu</a>
+                <a href="#tipografi" class="nav-link text-gray-600 hover:text-pink-500 px-3 py-2 rounded-md text-sm font-medium transition duration-150">Yazı Karakterleri</a>
+                <a href="#kolaykod" class="nav-link text-gray-600 hover:text-pink-500 px-3 py-2 rounded-md text-sm font-medium transition duration-150">Duyarlı Tasarım</a>
+                <a href="#bosluk" class="nav-link text-gray-600 hover:text-pink-500 px-3 py-2 rounded-md text-sm font-medium transition duration-150">Boşluk Kullanımı</a>
+                <a href="#odak" class="nav-link text-gray-600 hover:text-pink-500 px-3 py-2 rounded-md text-sm font-medium transition duration-150">Görsel Odak</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="hero-section" class="py-20 text-center transition duration-500 border-b-4 border-black" style="background-color: #FDD9E4;">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-5xl sm:text-6xl font-extrabold text-gray-900 mb-4 leading-tight animated-headline">
+                Hayal Gücünü <span class="text-gradient">Koda Dönüştür</span>!
+            </h2>
+            <p class="text-xl text-gray-700 mb-8">
+                Web tasarım bir sihir değildir, sadece basit kurallar ve doğru araçlarla oynanan eğlenceli bir oyundur. **Zahmetsizce profesyonel görünüm yakala!**
+            </p>
+            <button id="inspireButton" class="px-8 py-3 text-white font-bold rounded-xl text-lg code-easy-btn sketch-shadow">
+                ✨ Yaratıcı Enerjini Yükselt!
+            </button>
+            <p class="mt-4 text-sm text-gray-600">Her tıklama, bir tasarım kararıdır!</p>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+
+        <!-- MİNİ TEST -->
+        <section id="test" class="mb-20">
+            <h3 class="text-5xl text-gray-800 mb-8 border-red-500 dynamic-title" style="border-bottom-color: #FF4500;">
+                🚨 <span class="text-gradient">Geri Bildirim Testi</span>: Bilgileri Pekiştir!
+            </h3>
+            <p class="text-lg text-gray-600 mb-8">
+                Aşağıdaki 5 soruyu cevaplayarak bu atölyede öğrendiğin temel web tasarım prensiplerini ne kadar anladığını test et. Her bölümden birer soru içerir.
+            </p>
+
+            <form id="quizForm" class="quiz-card">
+                <div class="question" data-question-id="1">
+                    <p class="font-bold text-lg mb-3">1. (Renkler) Bir web sitesinde üçten fazla ana renk kullanmanın tasarım üzerindeki en büyük olumsuz etkisi nedir?</p>
+                    <label class="answer-label">
+                        <input type="radio" name="q1" value="a">
+                        <span class="answer-text">Kullanıcıların daha fazla etkileşim kurması.</span>
+                    </label>
+                    <label class="answer-label">
+                        <input type="radio" name="q1" value="b">
+                        <span class="answer-text">Görsel kafa karışıklığına ve karmaşık bir görünüme yol açması.</span>
+                    </label>
+                    <label class="answer-label">
+                        <input type="radio" name="q1" value="c">
+                        <span class="answer-text">Sitenin yüklenme süresini önemli ölçüde artırması.</span>
+                    </label>
+                </div>
+
+                <div class="question" data-question-id="2">
+                    <p class="font-bold text-lg mb-3">2. (Tipografi) Web tasarımında tipografinin en kritik rolü nedir?</p>
+                    <label class="answer-label">
+                        <input type="radio" name="q2" value="a">
+                        <span class="answer-text">Sitenin genel hızını optimize etmek.</span>
+                    </label>
+                    <label class="answer-label">
+                        <input type="radio" name="q2" value="b">
+                        <span class="answer-text">Okunabilirlik (legibility) ve erişilebilirlik sağlamak.</span>
+                    </label>
+                    <label class="answer-label">
+                        <input type="radio" name="q2" value="c">
+                        <span class="answer-text">Başlıkları metin gövdesinden daha büyük yapmak.</span>
+                    </label>
+                </div>
+
+                <div class="question" data-question-id="3">
+                    <p class="font-bold text-lg mb-3">3. (Duyarlı Tasarım) `sm:flex-row` gibi bir Tailwind sınıfı kullanıldığında, tarayıcı bu kuralı ne zaman uygulamaya başlar?</p>
+                    <label class="answer-label">
+                        <input type="radio" name="q3" value="a">
+                        <span class="answer-text">Yalnızca mobil cihazlarda.</span>
+                    </label>
+                    <label class="answer-label">
+                        <input type="radio" name="q3" value="b">
+                        <span class="answer-text">'Small' (küçük) ekran boyutuna ulaşıldığında ve daha büyük ekranlarda.</span>
+                    </label>
+                    <label class="answer-label">
+                        <input type="radio" name="q3" value="c">
+                        <span class="answer-text">Sayfa yüklendiği anda, ekran boyutundan bağımsız olarak.</span>
+                    </label>
+                </div>
+
+                <div class="question" data-question-id="4">
+                    <p class="font-bold text-lg mb-3">4. (Boşluk Kullanımı) Bir düğmenin içindeki metin ile kenarları arasındaki boşluğu artırmak için hangi CSS kavramı kullanılmalıdır?</p>
+                    <label class="answer-label">
+                        <input type="radio" name="q4" value="a">
+                        <span class="answer-text">Margin (Dış Boşluk)</span>
+                    </label>
+                    <label class="answer-label">
+                        <input type="radio" name="q4" value="b">
+                        <span class="answer-text">Border (Sınır)</span>
+                    </label>
+                    <label class="answer-label">
+                        <input type="radio" name="q4" value="c">
+                        <span class="answer-text">Padding (İç Boşluk)</span>
+                    </label>
+                </div>
+
+                <div class="question" data-question-id="5">
+                    <p class="font-bold text-lg mb-3">5. (Görsel Hiyerarşi) Görsel hiyerarşinin iyi kurulmadığı bir web sitesinde kullanıcı deneyimi (UX) açısından en büyük sorun nedir?</p>
+                    <label class="answer-label">
+                        <input type="radio" name="q5" value="a">
+                        <span class="answer-text">Site haritasının eksik olması.</span>
+                    </label>
+                    <label class="answer-label">
+                        <input type="radio" name="q5" value="b">
+                        <span class="answer-text">Kullanıcının sayfada neyin önemli olduğunu anlamakta zorlanması.</span>
+                    </label>
+                    <label class="answer-label">
+                        <input type="radio" name="q5" value="c">
+                        <span class="answer-text">İkinci bir ana renk tanımlama ihtiyacı.</span>
+                    </label>
+                </div>
+                
+                <div class="text-center mt-6">
+                    <button type="submit" id="submitQuiz" class="px-8 py-3 bg-pink-600 text-white font-bold rounded-xl text-lg code-easy-btn sketch-shadow hover:bg-pink-700">
+                        Testi Bitir ve Sonucu Gör!
+                    </button>
+                </div>
+            </form>
+
+            <div id="quizResult" class="mt-6 p-6 rounded-xl text-center font-bold text-xl hidden sketch-shadow" style="border: 3px solid #FF4500; background-color: #fcece0;"></div>
+        </section>
+
+        <hr class="my-12 border-gray-300">
+
+        <!-- 1. Renklerin Sihri -->
+        <section id="renkler" class="mb-20">
+            <h3 class="text-5xl text-gray-800 mb-8 border-pink-500 dynamic-title" style="border-bottom-color: #FF1493;">
+                <span class="text-gradient">1.</span> Ana ve Yardımcı Renkler: Palet Sihirbazı
+            </h3>
+            <p class="text-lg text-gray-600 mb-8">
+                Tasarımın en büyük sırrı: **Üçten fazla ana renk kullanma!** Bir renk tüm sitene hakim olurken (Ana Renk), diğeri tıklama düğmeleri ve önemli vurgular için kullanılır (Yardımcı Renk).
+            </p>
+
+            <div class="bg-white p-8 rounded-xl sketch-shadow border border-gray-200 grid md:grid-cols-3 gap-8 items-center">
+                <div class="space-y-6">
+                    <div>
+                        <label for="primaryColor" class="block text-lg font-medium text-gray-700 mb-2">🎨 Ana Renk (Baskın - Vurgu)</label>
+                        <input type="color" id="primaryColor" value="#00BFFF" class="w-full h-12 rounded-lg border-2 border-gray-300 cursor-pointer">
+                    </div>
+                    <div>
+                        <label for="secondaryColor" class="block text-lg font-medium text-gray-700 mb-2">✨ Yardımcı Renk (Metin)</label>
+                        <input type="color" id="secondaryColor" value="#FF1493" class="w-full h-12 rounded-lg border-2 border-gray-300 cursor-pointer">
+                    </div>
+                </div>
+
+                <div id="paletteDemo" class="md:col-span-2 p-6 rounded-lg text-center sketch-shadow" style="background-color: #f0f0f0;">
+                    <h4 id="demoTitle" class="text-3xl font-bold mb-4" style="color: #FF1493;">Başlık Böyle Görünecek</h4>
+                    <p id="demoText" class="text-gray-900 mb-4">
+                        Bu, metin rengidir. Okunabilir mi? Arka plan ile kontrastı iyi mi? Tasarımda en önemli kural **okunabilirliktir**.
+                    </p>
+                    <button id="demoButton" class="px-6 py-2 rounded-full text-white font-semibold code-easy-btn" style="background-color: #00BFFF;">
+                        Tıklama Düğmesi (Vurgu)
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <hr class="my-12 border-gray-300">
+
+        <!-- 2. Tipografi Sihirbazlığı -->
+        <section id="tipografi" class="mb-20">
+            <h3 class="text-5xl text-gray-800 mb-8 border-pink-500 dynamic-title" style="border-bottom-color: #FF1493;">
+                <span class="text-gradient">2.</span> Font Deneme Sürüşü: Yazı Karakteri Eşleştirmesi
+            </h3>
+            <p class="text-lg text-gray-600 mb-8">
+                Her fontun bir **kişiliği** vardır. Fontlar birbiriyle uyum içinde olmalı ve sitenin ruhunu yansıtmalıdır.
+            </p>
+
+            <div class="bg-white p-8 rounded-xl sketch-shadow border border-gray-100">
+                <div class="mb-6 pb-4 border-b border-gray-200">
+                    <label class="block text-xl font-bold text-gray-700 mb-3">Font Kombinasyonunu Seç:</label>
+                    <div id="fontControls" class="flex flex-wrap gap-4">
+                        <button data-header="Poppins" data-body="Inter" class="font-combo-btn px-4 py-2 bg-blue-100 text-blue-800 font-semibold rounded-full hover:bg-blue-200 transition active:bg-blue-300">
+                            Modern & Canlı
+                        </button>
+                        <button data-header="Playfair Display" data-body="Roboto" class="font-combo-btn px-4 py-2 bg-purple-100 text-purple-800 font-semibold rounded-full hover:bg-purple-200 transition active:bg-purple-300">
+                            Klasik & Güvenilir
+                        </button>
+                        <button data-header="Bungee Shade" data-body="Lato" class="font-combo-btn px-4 py-2 bg-pink-100 text-pink-800 font-semibold rounded-full hover:bg-pink-200 transition active:bg-pink-300">
+                            Neşeli & Cesur
+                        </button>
+                    </div>
+                </div>
+
+                <div id="typographyPreview" class="p-4 bg-gray-50 rounded-lg border-2 border-gray-300">
+                    <h4 id="previewHeader" class="text-5xl font-extrabold mb-4 text-gray-900 transition-all duration-300" style="font-family: 'Poppins', sans-serif;">
+                        Başlık Fontu Burada Parlayacak!
+                    </h4>
+                    <p id="previewBody" class="text-xl font-light text-gray-700 transition-all duration-300" style="font-family: 'Inter', sans-serif;">
+                        Bu metin, ziyaretçinin okuyacağı ana içeriktir. Okunabilirlik, font seçiminin en kritik noktasıdır.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <hr class="my-12 border-gray-300">
+
+        <!-- 3. Duyarlı Tasarım -->
+        <section id="kolaykod" class="mb-20">
+            <h3 class="text-5xl text-gray-800 mb-8 border-pink-500 dynamic-title" style="border-bottom-color: #FF1493;">
+                <span class="text-gradient">3.</span> Sihirli Kod: Duyarlı Tasarım (Mobile Uyum)
+            </h3>
+            <p class="text-lg text-gray-600 mb-8">
+                Web sitelerinin **telefonlarda ve bilgisayarlarda** farklı görünmesi gerekir. Tailwind CSS ile bu sadece tek bir sınıftır!
+            </p>
+
+            <div class="bg-gray-100 p-6 rounded-xl border-4 border-dashed border-gray-300">
+                <h4 class="text-2xl font-semibold text-gray-700 mb-4 text-center">Telefon <-> Bilgisayar Görünümünü Gör</h4>
+                <div id="responsiveDemoContainer" class="flex flex-col sm:flex-row gap-4 p-4 bg-white rounded-lg transition duration-300 justify-center sketch-shadow border-2 border-gray-700">
+                    <div class="flex-1 p-4 bg-blue-200 text-blue-800 rounded-lg text-center font-bold shadow-md">
+                        İçerik Kutusu A
+                    </div>
+                    <div class="flex-1 p-4 bg-green-200 text-green-800 rounded-lg text-center font-bold shadow-md">
+                        İçerik Kutusu B
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <hr class="my-12 border-gray-300">
+
+        <!-- 4. Boşluk Kullanımı -->
+        <section id="bosluk" class="mb-20">
+            <h3 class="text-5xl text-gray-800 mb-8 border-pink-500 dynamic-title" style="border-bottom-color: #FF1493;">
+                <span class="text-gradient">4.</span> Boşluk Sanatı: Tasarıma Nefes Aldır
+            </h3>
+            <p class="text-lg text-gray-600 mb-8">
+                Tasarımın en büyük sırrı **boşluktur**. İki sihirli kavram: **Padding (İç Boşluk)** ve **Margin (Dış Boşluk)**.
+            </p>
+
+            <div class="bg-gray-100 p-6 rounded-xl border-4 border-dashed border-gray-300">
+                <div class="flex justify-center items-center h-40">
+                    <div id="demoBoxOuter" class="bg-red-200 border-2 border-red-500 transition duration-300">
+                        <div id="demoBoxInner" class="bg-indigo-500 text-white font-semibold flex items-center justify-center p-2 text-sm transition duration-300">
+                            Önemli Buton
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="paddingInput" class="block text-sm font-medium text-gray-700 mb-1">Padding (İç Boşluk)</label>
+                        <input type="range" id="paddingInput" min="0" max="10" value="2" class="w-full h-2 bg-pink-300 rounded-lg appearance-none cursor-pointer">
+                        <span id="paddingValue" class="text-sm text-gray-600">p-2 (8px)</span>
+                    </div>
+                    <div>
+                        <label for="marginInput" class="block text-sm font-medium text-gray-700 mb-1">Margin (Dış Boşluk)</label>
+                        <input type="range" id="marginInput" min="0" max="10" value="0" class="w-full h-2 bg-pink-300 rounded-lg appearance-none cursor-pointer">
+                        <span id="marginValue" class="text-sm text-gray-600">m-0 (0px)</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <hr class="my-12 border-gray-300">
+
+        <!-- 5. Görsel Hiyerarşi -->
+        <section id="odak" class="mb-20">
+            <h3 class="text-5xl text-gray-800 mb-8 border-pink-500 dynamic-title" style="border-bottom-color: #FF1493;">
+                <span class="text-gradient">5.</span> Görsel Odaklanma: Ne Vurgulanmalı?
+            </h3>
+            <p class="text-lg text-gray-600 mb-8">
+                Bir sayfada her şeyi vurgularsanız, hiçbir şey vurgulamamış olursunuz. Kutulara tıklayarak odak noktasını değiştirin!
+            </p>
+
+            <div class="bg-white p-8 rounded-xl sketch-shadow border border-gray-200">
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-6 justify-center" id="focusContainer">
+                    <div id="item-1" class="focus-item p-4 bg-yellow-200 text-yellow-800 rounded-xl text-center font-bold border-4 border-yellow-300">
+                        1. Dikkati Çek
+                    </div>
+                    <div id="item-2" class="focus-item p-4 bg-teal-200 text-teal-800 rounded-xl text-center font-bold border-4 border-teal-300 active">
+                        2. Odak Noktası
+                    </div>
+                    <div id="item-3" class="focus-item p-4 bg-purple-200 text-purple-800 rounded-xl text-center font-bold border-4 border-purple-300">
+                        3. Geri Plana At
+                    </div>
+                    <div id="item-4" class="focus-item p-4 bg-orange-200 text-orange-800 rounded-xl text-center font-bold border-4 border-orange-300">
+                        4. Alternatif
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white p-8 text-center mt-12">
+        <p class="text-lg font-light">Tasarım, bir bulmaca çözmek gibidir. Parçaları birleştir ve sanat eserini yarat.</p>
+        <p class="text-sm mt-2 text-gray-400">© 2025 Görsel Kod Atölyesi. Tüm hakları saklıdır.</p>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        const quizAnswers = { q1: 'b', q2: 'b', q3: 'b', q4: 'c', q5: 'b' };
+        const quizForm = document.getElementById('quizForm');
+        const quizResult = document.getElementById('quizResult');
+        const questions = document.querySelectorAll('.question');
+
+        quizForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            let score = 0;
+            const totalQuestions = questions.length;
+
+            questions.forEach(qDiv => {
+                const qName = qDiv.querySelector('input[type="radio"]').name;
+                const selected = qDiv.querySelector(`input[name="${qName}"]:checked`);
+                const correct = quizAnswers[qName];
+                
+                qDiv.querySelectorAll('.answer-label').forEach(label => label.classList.remove('correct', 'incorrect'));
+
+                if (selected) {
+                    const selectedLabel = selected.parentElement;
+                    if (selected.value === correct) {
+                        score++;
+                        selectedLabel.classList.add('correct');
+                    } else {
+                        selectedLabel.classList.add('incorrect');
+                        qDiv.querySelector(`input[name="${qName}"][value="${correct}"]`).parentElement.classList.add('correct');
+                    }
+                } else {
+                    qDiv.querySelector(`input[name="${qName}"][value="${correct}"]`).parentElement.classList.add('correct');
+                }
+            });
+
+            const percentage = (score / totalQuestions) * 100;
+            let feedback = '';
+
+            if (score === totalQuestions) {
+                feedback = `Mükemmel! ${totalQuestions}'de ${score} doğru! Gerçek bir web tasarım dehasısın.`;
+                quizResult.style.backgroundColor = '#d1fae5';
+                quizResult.style.borderColor = '#34d399';
+            } else if (percentage >= 60) {
+                feedback = `Tebrikler! ${totalQuestions}'de ${score} doğru. Temelleri anladın!`;
+                quizResult.style.backgroundColor = '#fffbeb';
+                quizResult.style.borderColor = '#fcd34d';
+            } else {
+                feedback = `İyi bir başlangıç! ${totalQuestions}'de ${score} doğru. Tekrar gözden geçirebilirsin!`;
+                quizResult.style.backgroundColor = '#fee2e2';
+                quizResult.style.borderColor = '#f87171';
+            }
+
+            quizResult.innerHTML = `${feedback}<p class="mt-4 text-sm font-normal">Puanın: ${score}/${totalQuestions}</p>`;
+            quizResult.classList.remove('hidden');
+        });
+
+        const heroSection = document.getElementById('hero-section');
+        const inspireButton = document.getElementById('inspireButton');
+        const primaryColorInput = document.getElementById('primaryColor');
+        const secondaryColorInput = document.getElementById('secondaryColor');
+        const paletteDemo = document.getElementById('paletteDemo');
+        const demoTitle = document.getElementById('demoTitle');
+        const demoButton = document.getElementById('demoButton');
+        const demoText = document.getElementById('demoText');
+
+        inspireButton.addEventListener('click', () => {
+            const randomColor = '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
+            heroSection.style.backgroundColor = randomColor;
+            inspireButton.textContent = 'Harika bir renk seçimi! (Yine Dene)';
+            setTimeout(() => {
+                updatePalette(); 
+                inspireButton.textContent = '✨ Yaratıcı Enerjini Yükselt!';
+            }, 1000);
+        });
+
+        const updatePalette = () => {
+            const primary = primaryColorInput.value;
+            const secondary = secondaryColorInput.value;
+            const primaryTextColor = getTextColor(primary);
+            
+            paletteDemo.style.backgroundColor = primary + '11';
+            demoTitle.style.color = secondary;
+            demoButton.style.backgroundColor = primary;
+            demoButton.style.color = primaryTextColor;
+            demoText.style.color = secondary;
+
+            inspireButton.style.backgroundColor = primary;
+            inspireButton.style.color = primaryTextColor;
+        };
+
+        function getTextColor(hexColor) {
+            const r = parseInt(hexColor.substring(1, 3), 16);
+            const g = parseInt(hexColor.substring(3, 5), 16);
+            const b = parseInt(hexColor.substring(5, 7), 16);
+            const luminance = (0.299 * r + 0.587 * g + 0.114 * b * 0.5) / 255;
+            return luminance > 0.5 ? '#333333' : '#ffffff';
+        }
+
+        const paddingInput = document.getElementById('paddingInput');
+        const marginInput = document.getElementById('marginInput');
+        const paddingValueSpan = document.getElementById('paddingValue');
+        const marginValueSpan = document.getElementById('marginValue');
+        const demoBoxOuter = document.getElementById('demoBoxOuter');
+        const demoBoxInner = document.getElementById('demoBoxInner');
+
+        const updateSpacing = () => {
+            const pValue = paddingInput.value;
+            for (let i = 0; i <= 10; i++) demoBoxInner.classList.remove(`p-${i}`);
+            demoBoxInner.classList.add(`p-${pValue}`);
+            paddingValueSpan.textContent = `p-${pValue} (${pValue * 4}px)`;
+
+            const mValue = marginInput.value;
+            for (let i = 0; i <= 10; i++) demoBoxOuter.classList.remove(`m-${i}`);
+            demoBoxOuter.classList.add(`m-${mValue}`);
+            marginValueSpan.textContent = `m-${mValue} (${mValue * 4}px)`;
+        };
+
+        const focusItems = document.querySelectorAll('.focus-item');
+        focusItems.forEach(item => {
+            item.addEventListener('click', () => {
+                focusItems.forEach(i => {
+                    i.classList.remove('active');
+                    i.style.transform = 'scale(0.95)';
+                });
+                item.classList.add('active');
+                item.style.transform = 'scale(1.1)';
+            });
+        });
+
+        const previewHeader = document.getElementById('previewHeader');
+        const previewBody = document.getElementById('previewBody');
+        const fontComboButtons = document.querySelectorAll('.font-combo-btn');
+
+        fontComboButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const headerFont = button.dataset.header;
+                const bodyFont = button.dataset.body;
+                previewHeader.style.fontFamily = `'${headerFont}', sans-serif`;
+                previewBody.style.fontFamily = `'${bodyFont}', sans-serif`;
+            });
+        });
+
+        document.querySelectorAll('header nav a').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const targetElement = document.querySelector(this.getAttribute('href'));
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 85,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        primaryColorInput.addEventListener('input', updatePalette);
+        secondaryColorInput.addEventListener('input', updatePalette);
+        primaryColorInput.addEventListener('change', updatePalette);
+        secondaryColorInput.addEventListener('change', updatePalette);
+        paddingInput.addEventListener('input', updateSpacing);
+        marginInput.addEventListener('input', updateSpacing);
+
+        window.onload = () => {
+            updatePalette();
+            updateSpacing();
+        };
+    </script>
+</body>
+</html>
